@@ -3,18 +3,15 @@ package se.libraryhub.user.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
-import se.libraryhub.config.oauth.PrincipalDetails;
-import se.libraryhub.user.domain.User;
-import se.libraryhub.user.domain.dto.UserRequestDto;
-import se.libraryhub.user.domain.dto.UserResponseDto;
-import se.libraryhub.user.service.UserService;
 
-import javax.servlet.http.HttpServletRequest;
+import static se.libraryhub.config.oauth.SecurityUtil.getAccessToken;
+import static se.libraryhub.config.oauth.SecurityUtil.getCurrentUser;
+import se.libraryhub.user.domain.User;
+import se.libraryhub.user.domain.dto.request.UserRequestDto;
+import se.libraryhub.user.domain.dto.UserResponseDto;
+import se.libraryhub.user.domain.dto.request.UserUpdateRequestDto;
+import se.libraryhub.user.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,24 +20,24 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/home")
-    public String goHome(){
-        return "This is main page";
+    @GetMapping("/info")
+    public User goHome(){
+        System.out.println(getAccessToken());
+        return getCurrentUser();
     }
 
     @PostMapping("/update")
-    public UserResponseDto updateUser(@RequestBody UserRequestDto userRequestDto, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        User user = getUserByPrincipal(principalDetails);
-        return UserResponseDto.ofUserEntity(
+    public UserResponseDto updateUser(@RequestBody UserUpdateRequestDto userRequestDto){
+        User user = getCurrentUser();
+        return UserResponseDto.of(
                 userService.updateUser(user.getId(), userRequestDto.getUsername(), userRequestDto.getProfileImageUrl())
         );
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal PrincipalDetails principalDetails){
+    public ResponseEntity<?> deleteUser(){
         try{
-            User user = getUserByPrincipal(principalDetails);
-            userService.deleteUser(user.getId());
+            userService.deleteUser();
             return new ResponseEntity<>(HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -48,8 +45,8 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public UserResponseDto getUserProfile(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        return UserResponseDto.ofUserEntity(getUserByPrincipal(principalDetails));
+    public UserResponseDto getUserProfile(){
+        return UserResponseDto.of(getCurrentUser());
     }
 
     @GetMapping("/profileImg/{userId}")
@@ -57,7 +54,4 @@ public class UserController {
         return userService.getProfileImg(userId);
     }
 
-    public User getUserByPrincipal(PrincipalDetails principalDetails){
-        return userService.findUserByEmail(principalDetails.getUser().getEmail());
-    }
 }

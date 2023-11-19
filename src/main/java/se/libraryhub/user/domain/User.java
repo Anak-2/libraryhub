@@ -1,20 +1,17 @@
 package se.libraryhub.user.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import se.libraryhub.global.util.BaseTimeEntity;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
-public class User {
+@Data
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,12 +23,8 @@ public class User {
 
     private String profileImageUrl;
 
-
     @Enumerated(EnumType.STRING)
     private Role role = Role.GUEST;
-
-    @CreatedDate
-    private LocalDateTime registration_date;
 
     @Builder
     public User(String username, String email, String profileImageUrl) {

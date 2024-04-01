@@ -10,4 +10,4 @@
 를 이룩할 수 있는 기대 가치가 있습니다.
 
 자세한 내용은 아래 프로젝트 제안서에서 확인할 수 있습니다.<br>
-[프로젝트 제안서](https://example.com/proposal)
+[프로젝트 제안서](https://github.com/Anak-2/libraryhub/blob/master/docs/final_report.pdf)
